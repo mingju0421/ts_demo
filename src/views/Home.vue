@@ -1,18 +1,38 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    {{hello}}
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+<script lang="ts">
+import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
 
-export default {
-  name: 'Home',
-  components: {
-    HelloWorld
+@Component
+export default class Hello extends Vue {
+  @Prop({
+    type: String,
+    required: false,
+    default: 'world'
+  })
+  name!: string;
+  @Prop([String, Number])
+  age!: number;
+
+  helloName: string = this.name;
+  helloAge: number = this.getAgeSync(this.age);
+
+  get hello (): string {
+    return `name is: ${this.name}, age is: ${this.age}`
+  }
+
+  @Watch('helloName')
+  onNameChange(newVal: string, oldVal: string) {
+    console.log(newVal, oldVal)
+  }
+
+  getAgeSync(age: number) :number {
+    setTimeout(() => {}, 2000);
+    return 10;
   }
 }
 </script>
