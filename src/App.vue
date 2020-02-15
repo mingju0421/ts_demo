@@ -237,4 +237,5 @@ export default class App extends Vue {
 
 <style>
 *{box-sizing: border-box}
+#app{margin: 200px;}
 </style>
