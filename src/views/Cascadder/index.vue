@@ -1,6 +1,6 @@
 <template>
-    <!-- <div class="cascadderWrap" ref="cascadderWrap" @click="clickStop"> -->
-    <div class="cascadderWrap" ref="cascadderWrap" >
+    <div class="cascadderWrap" ref="cascadderWrap" @click="clickStop">
+    <!-- <div class="cascadderWrap" ref="cascadderWrap" > -->
         <div class="cascadder"  @click="onCascadderClick" >
             <div slot="header" v-if="false"></div>
             <div class="cascadderLabel" v-if="cascadderLabel">{{cascadderLabel}}</div>
@@ -32,9 +32,6 @@ interface selectionObj {
     selected?: boolean;
 }
 
-
-
-
 @Component({
     components: {
         Options,
@@ -46,6 +43,7 @@ export default class Cascadder extends Vue {
     cascadderLabel: String = '';
     placeholder: String = '请选择';
     selected: string[] = [];
+    isOutSide: boolean = true;
 
     @Prop()
     options!: objArr;
@@ -56,6 +54,7 @@ export default class Cascadder extends Vue {
             Vue.set(this.menus[0][i], 'isActivePath', false);
             Vue.set(this.menus[0][i], 'level', 1);
         }
+        document.addEventListener('click', this.clickOut)
     }
     onCascadderClick () {
         this.isDropdown = !this.isDropdown
@@ -70,12 +69,12 @@ export default class Cascadder extends Vue {
             }
             Vue.set(this.selected, 'length', level)
             Vue.set(this.selected, level-1, nodes[index].label)
-            console.log(this.selected)
         }else {
             Vue.set(this.selected, 'length', level)
             Vue.set(this.selected, level-1, nodes[index].label)
             Vue.set(this, 'cascadderLabel', this.selected.join('/'))
             this.isDropdown = false
+            this.$emit('change', this.selected)
         }
         
         for (let i: number = 0; i < this.menus[level-1].length; i++) {
@@ -85,7 +84,21 @@ export default class Cascadder extends Vue {
         }
         Vue.set(this.menus[level-1][index], 'isActivePath', true)
     }
-
+    clickStop () {
+        this.isOutSide = false
+        setTimeout(() => {
+            this.isOutSide = true
+        }, 16)
+    }
+    clickOut () {
+        if (this.isOutSide) {
+            this.isDropdown = false
+            this.$once('hook:beforeDestroy', () => {
+                window.removeEventListener('click', this.clickOut)
+            })
+        }
+        
+    }
 }
 
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Cascader :options="options"/>
+    <Cascader :options="options" @change="handleChange"/>
     <!-- <router-view /> -->
     <!-- <div class="block">
       <span class="demonstration">默认 click 触发子菜单</span>
