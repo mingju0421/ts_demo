@@ -1,5 +1,6 @@
 <template>
-    <div class="cascadderWrap" ref="cascadderWrap" @click.stop="() => {}">
+    <!-- <div class="cascadderWrap" ref="cascadderWrap" @click="clickStop"> -->
+    <div class="cascadderWrap" ref="cascadderWrap" >
         <div class="cascadder"  @click="onCascadderClick" >
             <div slot="header" v-if="false"></div>
             <div class="cascadderLabel" v-if="cascadderLabel">{{cascadderLabel}}</div>
@@ -8,109 +9,91 @@
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </div>
         </div>
-        <div class="dropdown" v-if="isDropdown">
-            <div class="selectionList">
-                <div class="selection" v-for="(selection, index) in rootSelectionList" :key="index" @click="selectChildrenSelection(selection)">
-                    <span>{{selection.label}}</span>
-                    <i class="fa fa-angle-right" aria-hidden="true"></i>
-                </div>
-            </div>
-            <div class="selectionList dropdownBorder" v-if="childrenSelectList.length">
-                <div class="selection" v-for="(selection, index) in childrenSelectList" :key="index" @click="selectLastSelection(selection)">
-                    <span>{{selection.label}}</span>
-                    <i class="fa fa-angle-right" aria-hidden="true"></i>
-                </div>
-            </div>
-            <div class="selectionList dropdownBorder" v-if="lastSelection.length">
-                <div class="selection" v-for="(selection, index) in lastSelection" :key="index" @click="selectOption(selection)">
-                    <span :class="{'selected': selection.selected}">{{selection.label}}</span>
-                </div>
-            </div>
+        <div class="dropdown" v-show="isDropdown">
+            <Options v-for="(nodes, index) in menus" :key="index" :nodes='nodes' @addNodes='addNodes'  :class="{border: index > 0}"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import {Vue, Component} from 'vue-property-decorator';
+import {Vue, Component, Prop, Watch} from 'vue-property-decorator';
+const Options = ()=> import('./options.vue')
 
 interface objArr {
     [index: number]: selectionObj;
     length: number;
 }
 interface selectionObj {
+    value: String;
     label: String;
+    isActivePath?: boolean;
+    level?:number;
     children?: objArr;
     selected?: boolean;
-    
 }
 
 
 
-@Component
-export default class cascadder extends Vue {
-    placeholder: String = '请选择';
+
+@Component({
+    components: {
+        Options,
+    }
+})
+export default class Cascadder extends Vue {
+    menus: any[] = []
     isDropdown: boolean = false;
     cascadderLabel: String = '';
-    temporaryCascadderLabel: String = '';
-    
-    /** 根选择列表 */
-    rootSelectionList: objArr = [{label: '指南', children: [{label: '设计原则'}, {label: '导航', children: [{label: '侧向导航'}, {label: '顶部导航'}]}]}, {label: '组件'}, {label: '资源'}];
-    /** 次级选择列表 */
-    childrenSelectList: objArr = [];
-    /** 最后一级选择器 */
-    lastSelection: objArr = [];
+    placeholder: String = '请选择';
+    selected: string[] = [];
 
+    @Prop()
+    options!: objArr;
+
+    mounted () {
+        Vue.set(this.menus, '0', JSON.parse(JSON.stringify(this.options)))
+        for (let i: number = 0; i < this.menus[0].length; i++) {
+            Vue.set(this.menus[0][i], 'isActivePath', false);
+            Vue.set(this.menus[0][i], 'level', 1);
+        }
+    }
     onCascadderClick () {
         this.isDropdown = !this.isDropdown
     }
+    addNodes (nodes: objArr, index: number, level: number) {
+        if (nodes[index].children) {
+            Vue.set(this.menus, 'length', level)
+            Vue.set(this.menus, level || 1, nodes[index].children)
+            for (let i:number = 0; i < this.menus[level].length; i++) {
+                Vue.set(this.menus[level][i], 'level', level + 1 || 1)
+                Vue.set(this.menus[level][i], 'isActivePath', false)
+            }
+            Vue.set(this.selected, 'length', level)
+            Vue.set(this.selected, level-1, nodes[index].label)
+            console.log(this.selected)
+        }else {
+            Vue.set(this.selected, 'length', level)
+            Vue.set(this.selected, level-1, nodes[index].label)
+            Vue.set(this, 'cascadderLabel', this.selected.join('/'))
+            this.isDropdown = false
+        }
+        
+        for (let i: number = 0; i < this.menus[level-1].length; i++) {
+            if (this.menus[level-1][i].isActivePath) {
+                Vue.set(this.menus[level-1][i], 'isActivePath', false);
+            }
+        }
+        Vue.set(this.menus[level-1][index], 'isActivePath', true)
+    }
 
-    selectChildrenSelection (obj: selectionObj) {
-        for (let i = 0; i < this.rootSelectionList.length; i++) {
-            delete this.rootSelectionList[i].selected
-        }
-        obj.selected = true
-        if (obj.children) {
-            this.childrenSelectList = obj.children
-        }
-        this.temporaryCascadderLabel = obj.label
-        
-    }
-    selectLastSelection (obj: selectionObj) {
-        for (let i = 0; i < this.childrenSelectList.length; i++) {
-            delete this.childrenSelectList[i].selected
-        }
-        obj.selected = true
-        if (obj.children) {
-            this.lastSelection = obj.children
-        }
-        this.temporaryCascadderLabel += '/' + obj.label
-        
-    }
-    heandleClose () {}
-    selectOption (obj: selectionObj) {
-        for (let i = 0; i < this.lastSelection.length; i++) {
-            delete this.lastSelection[i].selected
-        }
-        obj.selected = true
-        this.isDropdown = !this.isDropdown
-        this.temporaryCascadderLabel += '/' + obj.label
-        this.cascadderLabel = this.temporaryCascadderLabel
-    }
-    
-    clickOut () {
-        this.isDropdown = !this.isDropdown
-        this.$once('hook:beforeDestroy', () => {
-            window.removeEventListener('click', this.clickOut)
-        })
-    }
-    mounted () {
-        document.addEventListener('click', this.clickOut)
-    }
 }
+
 </script>
 
 <style lang="stylus">
 .cascadderWrap
+    .border
+        border-left 1px solid #999
     position relative
     .cascadder
         display flex
