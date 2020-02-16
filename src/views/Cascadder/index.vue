@@ -1,5 +1,5 @@
 <template>
-    <div class="cascadderWrap" ref="cascadderWrap" @click="clickStop" @keydown="keySelect">
+    <div class="cascadderWrap" ref="cascadderWrap" @click="clickStop" @keydown="keySelect" tabindex="0">
         <div class="cascadder" @click="onCascadderClick">
             <input type="text" class="inputInner" :placeholder="placeholder" :value="cascadderLabel">
             <div class="icon" ref="icon" :class="{'iconRotate': isDropdown}"> 
@@ -71,9 +71,7 @@ export default class Cascadder extends Vue {
     addNodes (nodes: objArr, index: number, level: number, flag: boolean = true, isKeyLeft: boolean = false) {
         if (nodes[index].children) {
             if (isKeyLeft) {
-                console.log(level - 1)
                 Vue.set(this.menus, 'length', level)
-                console.log(this.menus)
                 Vue.set(this.menus, level , nodes)
                 for (let i:number = 0; i < this.menus[level - 1].length; i++) {
                     Vue.set(this.menus[level - 1][i], 'level', level)
@@ -108,8 +106,12 @@ export default class Cascadder extends Vue {
             }
         }
         Vue.set(this.menus[level-1][index], 'isActivePath', true)
+        if (flag) {
+            Vue.set(this, 'keySelectedArr', JSON.parse(JSON.stringify(this.menus[level-1])))
+        }
     }
     clickStop () {
+        console.log('ss')
         this.isOutSide = false
         setTimeout(() => {
             this.isOutSide = true
@@ -153,6 +155,7 @@ export default class Cascadder extends Vue {
         }
     }
     keyUpSelect () {
+        console.log(38, this.keySelectedArr.length)
         if (this.keySelectedArr.length) {
             let index: number = 0;
             let arr: objArr = this.keySelectedArr
@@ -192,7 +195,6 @@ export default class Cascadder extends Vue {
             }
             Vue.set(this.menus[this.keySelectedArr[0].level - 2][index], 'isActivePath', true)
             Vue.set(this, 'keySelectedArr', JSON.parse(JSON.stringify(this.menus[this.keySelectedArr[0].level - 2])))
-            console.log(this.menus[this.keySelectedArr[0].level])
             this.addNodes(JSON.parse(JSON.stringify(this.menus[this.keySelectedArr[0].level])), index, this.keySelectedArr[0].level || 1, false, true)
         }
     }
@@ -209,6 +211,7 @@ export default class Cascadder extends Vue {
         }
     }
     keySelect (e:KeyboardEvent) {
+        console.log(e)
         switch (e.keyCode) {
             case 37:
                 this.keyLeftSelect()
