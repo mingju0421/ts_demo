@@ -72,9 +72,9 @@ export default class Cascadder extends Vue {
         if (nodes[index].children) {
             if (isKeyLeft) {
                 console.log(level - 1)
-                Vue.set(this.menus, 'length', level - 1)
+                Vue.set(this.menus, 'length', level)
                 console.log(this.menus)
-                Vue.set(this.menus, level - 1, nodes[index].children)
+                Vue.set(this.menus, level , nodes)
                 for (let i:number = 0; i < this.menus[level - 1].length; i++) {
                     Vue.set(this.menus[level - 1][i], 'level', level)
                     Vue.set(this.menus[level - 1][i], 'isActivePath', false)
