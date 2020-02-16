@@ -6,8 +6,8 @@
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </div>
         </div>
-        <div class="dropdown" v-show="isDropdown">
-            <Options v-for="(nodes, index) in menus" :key="index" :nodes='nodes' @addNodes='addNodes'  :class="{border: index > 0}"/>
+        <div class="dropdown" v-show="isDropdown" >
+            <Options v-for="(nodes, index) in menus" :key="index" :nodes='nodes' @addNodes='addNodes'  :class="{border: index > 0}" @keydown="keySelect"/>
         </div>
     </div>
 </template>
@@ -28,6 +28,7 @@ interface selectionObj {
     children?: objArr;
     selected?: boolean;
 }
+
 
 @Component({
     components: {
@@ -60,20 +61,42 @@ export default class Cascadder extends Vue {
             Vue.set(this.keySelectedArr, 'length', 0)
         }
     }
-    addNodes (nodes: objArr, index: number, level: number, flag: boolean = true) {
+    /**
+     * 确定渲染数组 menus 的结构
+     * @param {objArr} nodes 选中的一级选项数组
+     * @param {number} index 选中的选项在数组中的下标
+     * @param {number} level 当前数组的层级
+     * @param {booleam} flag 当点击触发时，默认为 true，键盘触发的时候传 false，阻止触发 change 事件
+     */
+    addNodes (nodes: objArr, index: number, level: number, flag: boolean = true, isKeyLeft: boolean = false) {
         if (nodes[index].children) {
-            Vue.set(this.menus, 'length', level)
-            Vue.set(this.menus, level || 1, nodes[index].children)
-            for (let i:number = 0; i < this.menus[level].length; i++) {
-                Vue.set(this.menus[level][i], 'level', level + 1 || 1)
-                Vue.set(this.menus[level][i], 'isActivePath', false)
+            if (isKeyLeft) {
+                console.log(level - 1)
+                Vue.set(this.menus, 'length', level - 1)
+                console.log(this.menus)
+                Vue.set(this.menus, level - 1, nodes[index].children)
+                for (let i:number = 0; i < this.menus[level - 1].length; i++) {
+                    Vue.set(this.menus[level - 1][i], 'level', level)
+                    Vue.set(this.menus[level - 1][i], 'isActivePath', false)
+                }
+                
+            }else {
+                Vue.set(this.menus, 'length', level)
+                Vue.set(this.menus, level || 1, nodes[index].children)
+                for (let i:number = 0; i < this.menus[level].length; i++) {
+                    Vue.set(this.menus[level][i], 'level', level + 1 || 1)
+                    Vue.set(this.menus[level][i], 'isActivePath', false)
+                }
             }
+            
+            
             Vue.set(this.selected, 'length', level)
             Vue.set(this.selected, level-1, nodes[index].label)
         }else {
             Vue.set(this.selected, 'length', level)
             Vue.set(this.selected, level-1, nodes[index].label)
             if (flag) {
+                // 当点击的选项没有子元素的时候，给 cascadderLabel 赋值，隐藏下拉框， 触发传入的 change 事件
                 Vue.set(this, 'cascadderLabel', this.selected.join('/'))
                 this.isDropdown = false
                 this.$emit('change', this.selected)
@@ -169,7 +192,8 @@ export default class Cascadder extends Vue {
             }
             Vue.set(this.menus[this.keySelectedArr[0].level - 2][index], 'isActivePath', true)
             Vue.set(this, 'keySelectedArr', JSON.parse(JSON.stringify(this.menus[this.keySelectedArr[0].level - 2])))
-            this.addNodes(JSON.parse(JSON.stringify(this.menus[this.keySelectedArr[0].level])), index, this.keySelectedArr[0].level || 1, false)
+            console.log(this.menus[this.keySelectedArr[0].level])
+            this.addNodes(JSON.parse(JSON.stringify(this.menus[this.keySelectedArr[0].level])), index, this.keySelectedArr[0].level || 1, false, true)
         }
     }
     keyEnter () {

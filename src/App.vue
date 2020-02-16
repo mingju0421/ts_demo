@@ -230,8 +230,8 @@ export default class App extends Vue {
       }
     ];
     handleChange(value: string[]) {
-      console.log(value);
-    }
+      ''
+  }
 }
 </script>
 
