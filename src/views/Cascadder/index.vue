@@ -7,13 +7,13 @@
             </div>
         </div>
         <div class="dropdown" v-show="isDropdown" >
-            <Options v-for="(nodes, index) in menus" :key="index" :nodes='nodes' @addNodes='addNodes'  :class="{border: index > 0}" @keydown="keySelect"/>
+            <Options v-for="(nodes, index) in menus" :key="index" :nodes='nodes' @addNodes='addNodes'  :class="{border: index > 0}" @keydown="keySelect" ref="nodes"/>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import {Vue, Component, Prop, Watch} from 'vue-property-decorator';
+import {Vue, Component, Prop} from 'vue-property-decorator';
 const Options = ()=> import('./options.vue')
 
 interface objArr {
@@ -98,6 +98,7 @@ export default class Cascadder extends Vue {
                 Vue.set(this, 'cascadderLabel', this.selected.join('/'))
                 this.isDropdown = false
                 this.$emit('change', this.selected)
+                Vue.set(this.keySelectedArr, 'length', 0)
             }
         }
         for (let i: number = 0; i < this.menus[level-1].length; i++) {
@@ -111,7 +112,6 @@ export default class Cascadder extends Vue {
         }
     }
     clickStop () {
-        console.log('ss')
         this.isOutSide = false
         setTimeout(() => {
             this.isOutSide = true
@@ -155,7 +155,6 @@ export default class Cascadder extends Vue {
         }
     }
     keyUpSelect () {
-        console.log(38, this.keySelectedArr.length)
         if (this.keySelectedArr.length) {
             let index: number = 0;
             let arr: objArr = this.keySelectedArr
@@ -211,7 +210,6 @@ export default class Cascadder extends Vue {
         }
     }
     keySelect (e:KeyboardEvent) {
-        console.log(e)
         switch (e.keyCode) {
             case 37:
                 this.keyLeftSelect()

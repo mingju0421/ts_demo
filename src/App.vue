@@ -1,32 +1,20 @@
 <template>
   <div id="app">
-    <Cascader :options="options" @change="handleChange"/>
-    <!-- <router-view /> -->
-    <!-- <div class="block">
-      <span class="demonstration">默认 click 触发子菜单</span>
-      <el-cascader
-        v-model="value"
-        :options="options"
-        @change="handleChange"></el-cascader>
-    </div> -->
-    <!-- <div class="block">
-      <span class="demonstration">hover 触发子菜单</span>
-      <el-cascader
-        v-model="value"
-        :options="options"
-        :props="{ expandTrigger: 'hover' }"
-        @change="handleChange"></el-cascader>
-    </div> -->
+    <Radio :label="1"><p>选择一</p></Radio>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-const Cascader = () => import('./views/Cascadder/index.vue')
+const Cascader = () => import('./views/Cascadder/index.vue');
+const Select = () => import('./views/Select/index.vue');
+const Radio = () => import('@/views/Radio/index.vue')
 
 @Component({
   components: {
     Cascader,
+    Select,
+    Radio
   },
 })
 export default class App extends Vue {
@@ -232,6 +220,9 @@ export default class App extends Vue {
     handleChange(value: string[]) {
       ''
   }
+  selectOptions: {}[] = [{value: '选项1', label: '黄金糕'}, {value: '选项2', label: '双皮奶'}];
+  selectValue: string = ''
+
 }
 </script>
 

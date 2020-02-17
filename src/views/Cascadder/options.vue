@@ -1,6 +1,6 @@
 <template>
     <div class="options">
-        <div class="selection" v-for="(node, index) in nodes" :key="index" @click="addNodes(index, node.level)" :class="{'selectedNode': node.isActivePath}">
+        <div class="selection" v-for="(node, index) in nodes" :key="index" @click="addNodes(index, node.level)" :class="{'selectedNode': node.isActivePath}" :ref='index'>
             <span  :class="{'selected': node.isActivePath}">{{node.label}}</span>
             <i class="fa fa-angle-right" aria-hidden="true" v-if="node.children"></i>
         </div>
@@ -28,6 +28,7 @@ export default class Options extends Vue {
     @Prop({default: []})
     nodes!: objArr;
     addNodes (index: number, level:number) {
+        console.log(this.$refs)
         this.$emit('addNodes', JSON.parse(JSON.stringify(this.nodes)), index, level)
     }
 }
