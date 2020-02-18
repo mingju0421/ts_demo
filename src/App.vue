@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <Radio :label="1"><p>选择一</p></Radio>
+      <!-- <Cascader :options="options"></Cascader> -->
+      <Radio label="1" v-model="radio" :disabled="true">选择一</Radio>
+      <Radio label="2" v-model="radio">选择二</Radio>
+    
+    
   </div>
 </template>
 
@@ -221,7 +225,8 @@ export default class App extends Vue {
       ''
   }
   selectOptions: {}[] = [{value: '选项1', label: '黄金糕'}, {value: '选项2', label: '双皮奶'}];
-  selectValue: string = ''
+  selectValue: string = '';
+  radio: string = '1';
 
 }
 </script>

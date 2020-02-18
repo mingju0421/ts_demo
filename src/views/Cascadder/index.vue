@@ -66,7 +66,7 @@ export default class Cascadder extends Vue {
      * @param {objArr} nodes 选中的一级选项数组
      * @param {number} index 选中的选项在数组中的下标
      * @param {number} level 当前数组的层级
-     * @param {booleam} flag 当点击触发时，默认为 true，键盘触发的时候传 false，阻止触发 change 事件
+     * @param {boolean} flag 当点击触发时，默认为 true，键盘触发的时候传 false，阻止触发 change 事件
      */
     addNodes (nodes: objArr, index: number, level: number, flag: boolean = true, isKeyLeft: boolean = false) {
         if (nodes[index].children) {

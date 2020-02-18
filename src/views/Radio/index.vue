@@ -1,19 +1,20 @@
 
 <template>
-    <div class="Radio">
+<!-- <div class="radioGrup"> -->
+    <div class="Radio" @click="select" :class="{'disabled': disabled}">
         <span class="radio_input">
-            <span class="radio_inner"></span>
-            <input type="radio" class="radio" @click="a">
+            <span class="radio_inner" :class="{'isChecked': label === model, 'disabled': disabled}"></span>
+            <input type="radio" class="radio">
         </span>
-        
-        <span class="label">{{$slots.default[0].text}}</span>
+        <span class="label" :class="{'isChecked': label === model, 'disabled': disabled}">{{$slots.default[0].text}}</span>
     </div>
+<!-- </div> -->
 </template>
 
 <script  lang="ts">
 import {Vue, Component, Prop, Emit} from 'vue-property-decorator';
 @Component
-export default class Option extends Vue{
+export default class Radio extends Vue{
     isChecked: boolean = false;
     @Prop({default: ''})
     value!: string;
@@ -30,11 +31,19 @@ export default class Option extends Vue{
     changed () {
         this.$emit('change', this.value)
     }
-    a () {
+    /**
+     * 选择单选框, 修改
+     */
+    select ():void {
         if (this.$slots.default) {
-            console.log(this.$slots.default[0])
+            this.model = this.label
         }
-        
+    }
+    get model  ():string {
+        return this.value
+    }
+    set model (val) {
+        this.$emit('input', val);        
     }
 
 }
@@ -42,7 +51,11 @@ export default class Option extends Vue{
 
 <style scoped lang="stylus">
 .Radio
+    cursor: pointer;
     position relative
+    margin 0 30px 10px 0
+    .isChecked
+        color #409eff
     .label
         padding-left 10px
     .radio_input
@@ -67,9 +80,16 @@ export default class Option extends Vue{
                 right 0
                 margin auto
                 border-radius 50%
+                    
             &.isChecked
                 background-color #409eff
                 border-color #409eff
+                color #409eff
+                &.disabled
+                    background-color #f5f7fa
+                    border-color #e4e7ed
+                    &:after
+                        background-color #c0c4cc
 
 
 </style>
