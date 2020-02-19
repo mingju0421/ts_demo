@@ -1,11 +1,13 @@
 <template>
   <div id="app">
       <!-- <Cascader :options="options"></Cascader> -->
-      <RadioGrup v-model="radio">
+      <!-- <RadioGrup v-model="radio">
         <Radio label="1" disabled>选择一</Radio>
         <Radio label="2" :disabled='false'>选择二</Radio>
-      </RadioGrup>
-    
+      </RadioGrup> -->
+    <Select v-model="selectValue" placeholder='请选择'>
+      <Option v-for="item in selectOptions" :key="item.vale" :label="item.label" :value="item.value"></Option>
+    </Select>
     
   </div>
 </template>
