@@ -1,37 +1,33 @@
 
 <template>
-<div class="radioGrup"> 
-    <slot></slot>
-</div>
+    <div class="Radio" :class="{'disabled': isDisabled}">
+        <span class="radio_input">
+            <span class="radio_inner" :class="{'isChecked': label === model, 'disabled': isDisabled}"></span>
+            <input type="radio" class="radio" :value="label" v-model="model" :id='id'>
+        </span>
+        <label :for="id" class="label" :class="{'isChecked': label === model, 'disabled': isDisabled}">{{$slots.default[0].text}}</label>
+    </div>
 </template>
 
 <script  lang="ts">
-import {Vue, Component, Prop, Emit, Watch} from 'vue-property-decorator';
-const Radio = () => import('./Radio.vue');
-@Component({
-    components: {
-        Radio,
-    }
-})
-export default class RadioGrup extends Vue{
+import {Vue, Component, Prop, Emit} from 'vue-property-decorator';
+@Component
+export default class Radio extends Vue{
     isChecked: boolean = false;
     @Prop({default: ''})
     value!: string;
     @Prop({default: ''})
-    label!: string;
-    @Prop({default: false})
-    disabled!: boolean;
+    label!: string|number;
+    @Prop({default: true})
+    disabled!: boolean|string;
     @Prop({default: false})
     border!: boolean;
     @Prop({default: ''})
     name!: string;
 
     id: string = this.generateId()
+    grup?: any
 
-    @Emit('change')
-    changed () {
-        this.$emit('change', this.value)
-    }
     generateId () {
         const s = []
         const hexDigits = '0123456789abcdef';
@@ -45,15 +41,36 @@ export default class RadioGrup extends Vue{
             this.model = this.label
         }
     }
-    get model  ():string {
+    get model  (): string|number {
+        if (this.isGrup) {
+            return this.grup.value
+        }
         return this.value
     }
     set model (val) {
-        this.$emit('input', val);        
+        if (this.isGrup) {
+            this.grup.$emit('input', val)
+        }else {
+            this.$emit('input', val);
+        }
     }
-    @Watch('value')
-    chenge (val: any) {
-        console.log(val)
+    get isDisabled () {
+        if (this.disabled === '') {
+            return true
+        }
+        return this.disabled
+    }
+    get isGrup () {
+        let parent = this.$parent
+        while (parent) {
+            if (parent.$options.name !== 'RadioGrup') {
+                parent = parent.$parent
+            }else {
+                this.grup = parent
+                return true
+            }
+        }
+        return false
     }
 }
 </script>

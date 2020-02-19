@@ -1,8 +1,10 @@
 <template>
   <div id="app">
       <!-- <Cascader :options="options"></Cascader> -->
-      <Radio label="1" v-model="radio" :disabled="true">选择一</Radio>
-      <Radio label="2" v-model="radio">选择二</Radio>
+      <RadioGrup v-model="radio">
+        <Radio label="1" disabled>选择一</Radio>
+        <Radio label="2" :disabled='false'>选择二</Radio>
+      </RadioGrup>
     
     
   </div>
@@ -12,12 +14,14 @@
 import { Component, Vue } from 'vue-property-decorator';
 const Cascader = () => import('./views/Cascadder/index.vue');
 const Select = () => import('./views/Select/index.vue');
-const Radio = () => import('@/views/Radio/index.vue')
+const RadioGrup = () => import('@/views/Radio/index.vue')
+const Radio = () => import('./views/Radio/Radio.vue')
 
 @Component({
   components: {
     Cascader,
     Select,
+    RadioGrup,
     Radio
   },
 })
